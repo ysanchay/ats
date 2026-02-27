@@ -43,3 +43,13 @@ Experience
     jd = "Need python sql airflow"
     result = run_ats_checker(resume, jd)
     assert 0 <= result.ats_score <= 100
+
+
+def test_ats_checker_flags_table_spacing_in_resume_text():
+    resume = """Jordan Lane
+jordan@lane.com
+Experience        Skills
+- Built data pipelines in Python.
+"""
+    result = run_ats_checker(resume, "Need python")
+    assert "no_tables" in result.rejection_reasons
