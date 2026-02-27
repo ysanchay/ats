@@ -53,3 +53,14 @@ Experience        Skills
 """
     result = run_ats_checker(resume, "Need python")
     assert "no_tables" in result.rejection_reasons
+
+
+def test_parser_preserves_layout_signals_for_ats_checks():
+    text = """Jordan Lane
+jordan@lane.com
+Experience\t\tSkills
+Role        Company
+"""
+    parsed = parse_resume(text)
+    assert "\t\t" in parsed.raw_text
+    assert "        " in parsed.raw_text

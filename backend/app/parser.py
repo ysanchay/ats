@@ -43,13 +43,27 @@ def _extract_docx(content: bytes) -> str:
 
 
 def normalize_text(text: str) -> str:
-    text = text.replace("\r", "\n")
+    """Normalize text for content parsing while preserving line structure."""
+    text = _normalize_newlines(text)
+    text = re.sub(r"[ \t]{2,}", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
 
+def normalize_layout_text(text: str) -> str:
+    """Normalize text for layout checks without collapsing tabs/spacing cues."""
+    text = _normalize_newlines(text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def _normalize_newlines(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def parse_resume(text: str) -> ParsedResume:
     normalized = normalize_text(text)
+    layout_normalized = normalize_layout_text(text)
     lines = [line.strip() for line in normalized.splitlines() if line.strip()]
 
     name = lines[0] if lines else ""
@@ -70,7 +84,7 @@ def parse_resume(text: str) -> ParsedResume:
         email=email_match.group(0) if email_match else "",
         phone=phone_match.group(0) if phone_match else "",
         sections=parsed_sections,
-        raw_text=normalized,
+        raw_text=layout_normalized,
     )
 
 
